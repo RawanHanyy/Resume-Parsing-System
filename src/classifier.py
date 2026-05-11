@@ -16,9 +16,11 @@ prediction = clf.predict("Experienced Python developer with Django and AWS...")
 
 import os
 import pickle
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 from sklearn.model_selection import train_test_split
@@ -36,7 +38,10 @@ from tensorflow.keras.preprocessing.text     import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.callbacks              import EarlyStopping, ModelCheckpoint
 
-from preprocess import clean_text
+try:
+    from .preprocess import clean_text
+except ImportError:
+    from preprocess import clean_text
 
 
 # Constants 
@@ -48,6 +53,7 @@ BATCH_SIZE   = 32
 EPOCHS       = 20       # early stopping will kick in before this
 TEST_SIZE    = 0.20     # 80% train / 20% test
 RANDOM_STATE = 42
+ARTIFACTS_DIR = Path(__file__).resolve().parents[1]
 
 
 class ResumeClassifier:
@@ -210,7 +216,12 @@ class ResumeClassifier:
         )
         self.y_test = y_test
 
-        os.makedirs("models", exist_ok=True)
+        models_dir = ARTIFACTS_DIR / "models"
+        models_dir.mkdir(exist_ok=True)
+        checkpoint_path = models_dir / (
+            f"{self.model_type}_best.weights.h5" if self.model_type == "bert"
+            else f"{self.model_type}_best.keras"
+        )
 
         callbacks = [
             EarlyStopping(
@@ -220,8 +231,9 @@ class ResumeClassifier:
                 verbose   = 1
             ),
             ModelCheckpoint(
-                filepath = f"models/{self.model_type}_best.h5",
+                filepath       = str(checkpoint_path),
                 save_best_only = True,
+                save_weights_only = self.model_type == "bert",
                 monitor        = "val_accuracy",
                 verbose        = 1
             )
@@ -243,15 +255,15 @@ class ResumeClassifier:
             )
 
             # Save tokenizer and encoder
-            with open("models/tokenizer.pkl", "wb") as f:
+            with open(models_dir / "tokenizer.pkl", "wb") as f:
                 pickle.dump(self.tokenizer, f)
 
         # BERT path 
         elif self.model_type == "bert":
+            self.model = self._build_bert()
             X_train = self._encode_bert(X_train_raw)
             X_test  = self._encode_bert(X_test_raw)
             self.X_test = X_test
-            self.model  = self._build_bert()
 
             self.history = self.model.fit(
                 X_train, y_train,
@@ -263,10 +275,10 @@ class ResumeClassifier:
             )
 
         # Save label encoder
-        with open("models/label_encoder.pkl", "wb") as f:
+        with open(models_dir / "label_encoder.pkl", "wb") as f:
             pickle.dump(self.label_encoder, f)
 
-        print(f"\n[✓] Training complete. Model saved to models/")
+        print(f"\n[✓] Training complete. Model artifacts saved to {models_dir}/")
 
     # 6. Evaluate 
     def evaluate(self, save_plots: bool = True):
@@ -297,9 +309,17 @@ class ResumeClassifier:
 
         class_names = self.label_encoder.classes_
         print("Classification Report:")
-        print(classification_report(self.y_test, y_pred, target_names=class_names))
+        print(
+            classification_report(
+                self.y_test,
+                y_pred,
+                target_names=class_names,
+                zero_division=0,
+            )
+        )
 
-        os.makedirs("docs", exist_ok=True)
+        docs_dir = ARTIFACTS_DIR / "docs"
+        docs_dir.mkdir(exist_ok=True)
 
         # Confusion matrix 
         cm = confusion_matrix(self.y_test, y_pred)
@@ -319,8 +339,8 @@ class ResumeClassifier:
         plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
         if save_plots:
-            plt.savefig(f"docs/confusion_matrix_{self.model_type}.png", dpi=150)
-            print("[✓] Saved: docs/confusion_matrix.png")
+            plt.savefig(docs_dir / f"confusion_matrix_{self.model_type}.png", dpi=150)
+            print(f"[✓] Saved: {docs_dir / f'confusion_matrix_{self.model_type}.png'}")
         plt.show()
 
         # Training curves 
@@ -347,8 +367,8 @@ class ResumeClassifier:
 
             plt.tight_layout()
             if save_plots:
-                plt.savefig(f"docs/training_curves_{self.model_type}.png", dpi=150)
-                print("[✓] Saved: docs/training_curves.png")
+                plt.savefig(docs_dir / f"training_curves_{self.model_type}.png", dpi=150)
+                print(f"[✓] Saved: {docs_dir / f'training_curves_{self.model_type}.png'}")
             plt.show()
 
         return acc
@@ -396,6 +416,7 @@ class ResumeClassifier:
 
     # 8. Save / Load 
     def save(self, path: str = "models/"):
+        os.makedirs(path, exist_ok=True)
         self.model.save(os.path.join(path, f"{self.model_type}_model.keras"))
         print(f"[✓] Model saved to {path}")
 
