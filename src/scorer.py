@@ -12,7 +12,7 @@ import math
 from typing import Optional
 from collections import Counter
 
-from resume_parser import SKILL_TAXONOMY, ALL_SKILLS
+from resume_parser import ALL_SKILLS, skill_pattern
 
 
 # Weights for each scoring component 
@@ -59,7 +59,7 @@ def _cosine(v1: dict, v2: dict) -> float:
 
 def _extract_required_skills(jd_text: str) -> set[str]:
     jd_lower = jd_text.lower()
-    return {s for s in ALL_SKILLS if re.search(r"\b" + re.escape(s) + r"\b", jd_lower)}
+    return {s for s in ALL_SKILLS if skill_pattern(s).search(jd_lower)}
 
 
 def _degree_score(education: list[dict]) -> float:
@@ -125,7 +125,7 @@ class CandidateScorer:
             candidate_skills.update(skill_list)
 
         if not required:
-            return 1.0, list(candidate_skills), []
+            return 0.0, [], []
 
         matched = required & candidate_skills
         missing = required - candidate_skills
@@ -160,6 +160,7 @@ class CandidateScorer:
             },
             "matched_skills": matched_skills,
             "missing_skills": missing_skills,
+            "required_skills": sorted(_extract_required_skills(self.jd)),
             "recommendation": _recommendation(total),
         }
 

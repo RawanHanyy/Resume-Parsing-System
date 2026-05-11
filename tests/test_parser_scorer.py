@@ -118,6 +118,17 @@ class TestResumeParser:
         exp = sample_parsed["experience"]
         assert isinstance(exp, list)
 
+    def test_experience_year_estimation_uses_full_years(self, tmp_path):
+        resume_file = tmp_path / "dated_resume.txt"
+        resume_file.write_text(
+            "Alex Smith\nExperience\nDeveloper\nJan 2019 - Dec 2023\n- Built APIs",
+            encoding="utf-8",
+        )
+
+        parsed = ResumeParser(str(resume_file)).parse()
+
+        assert parsed["total_experience_years"] == 4.0
+
     def test_all_keys_present(self, sample_parsed):
         expected_keys = {
             "contact", "name", "summary", "skills",
@@ -169,6 +180,25 @@ class TestCandidateScorer:
         # matched + missing should cover all required skills
         assert isinstance(result["matched_skills"], list)
         assert isinstance(result["missing_skills"], list)
+        assert isinstance(result["required_skills"], list)
+
+    def test_no_required_skills_does_not_score_as_full_match(self, sample_parsed):
+        unrelated_jd = "We need a restaurant manager for menu planning and kitchen operations."
+        result = CandidateScorer(sample_parsed, unrelated_jd).score()
+
+        assert result["breakdown"]["skill_match"] == 0.0
+        assert result["matched_skills"] == []
+        assert result["missing_skills"] == []
+        assert result["required_skills"] == []
+
+    def test_missing_required_skills_are_reported(self, sample_parsed):
+        frontend_jd = "We need React, Angular, and Vue experience."
+        result = CandidateScorer(sample_parsed, frontend_jd).score()
+
+        assert result["breakdown"]["skill_match"] == 0.0
+        assert result["matched_skills"] == []
+        assert result["missing_skills"] == ["angular", "react", "vue"]
+        assert result["required_skills"] == ["angular", "react", "vue"]
 
     def test_recommendation_str(self, sample_parsed):
         scorer = CandidateScorer(sample_parsed, JOB_DESCRIPTION)
