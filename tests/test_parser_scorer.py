@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from resume_parser import ResumeParser, EMAIL_RE, PHONE_RE, DEGREE_PATTERNS
 from scorer import CandidateScorer, rank_candidates, _cosine, _tfidf_vectors, _recommendation
 
-# ── Fixtures ──────────────────────────────────────────────────────────────────
+# Fixtures 
 
 SAMPLE_RESUME_TEXT = """
 John Doe
@@ -69,7 +69,7 @@ def sample_parsed(tmp_path):
     return parser.parse()
 
 
-# ── Parser tests ──────────────────────────────────────────────────────────────
+# Parser tests 
 
 class TestRegexPatterns:
     def test_email_detection(self):
@@ -126,7 +126,7 @@ class TestResumeParser:
         assert expected_keys.issubset(sample_parsed.keys())
 
 
-# ── Scorer tests ──────────────────────────────────────────────────────────────
+# Scorer tests
 
 class TestTFIDFHelpers:
     def test_cosine_identical(self):

@@ -5,8 +5,6 @@ Trains and evaluates two models:
   1. Bidirectional LSTM
   2. BERT (DistilBERT) Transformer
 
-Dataset: Kaggle Resume Dataset (~2400 resumes, 25 job categories)
-
 Usage
 -----
 from classifier import ResumeClassifier
@@ -83,11 +81,11 @@ class ResumeClassifier:
         # Flexible column detection
         text_col = next(
             c for c in df.columns
-            if "resume" in c.lower() or "text" in c.lower()
+            if "resume" in c.lower() or "text" in c.lower() or "objective" in c.lower()
         )
         label_col = next(
             c for c in df.columns
-            if "category" in c.lower() or "label" in c.lower()
+            if "category" in c.lower() or "label" in c.lower() or "position" in c.lower()
         )
 
         print(f"[✓] Loaded {len(df)} resumes from '{csv_path}'")
@@ -164,7 +162,7 @@ class ResumeClassifier:
         model.summary()
         return model
 
-    # 4. Build BERT model
+    # 4. Build BERT model 
     def _build_bert(self):
         """
         DistilBERT fine-tuned for sequence classification.
@@ -222,7 +220,7 @@ class ResumeClassifier:
                 verbose   = 1
             ),
             ModelCheckpoint(
-                filepath       = f"models/{self.model_type}_best.keras",
+                filepath = f"models/{self.model_type}_best.h5",
                 save_best_only = True,
                 monitor        = "val_accuracy",
                 verbose        = 1
@@ -355,7 +353,7 @@ class ResumeClassifier:
 
         return acc
 
-    # 7. Predict a single resume 
+    # 7. Predict a single resume
     def predict(self, resume_text: str) -> dict:
         """
         Predict the job category of a single resume text.
