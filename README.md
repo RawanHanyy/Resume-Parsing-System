@@ -8,17 +8,37 @@
 
 ```
 resume-parser/
-├── src/
-│   ├── resume_parser.py     # Core NLP extraction engine
-│   └── scorer.py            # TF-IDF + skill-match scoring
-├── tests/
-│   └── test_parser_scorer.py
+│
+├── src/                         ← all Python logic lives here
+│   ├── preprocess.py            ← cleans text before the model sees it
+│   ├── resume_parser.py         ← extracts info from resume files
+│   ├── scorer.py                ← scores candidates vs job description
+│   └── classifier.py           ← trains LSTM + BERT, evaluates, predicts
+│
+├── notebooks/
+│   └── train_model.ipynb        ← run this to train and evaluate
+│
+├── models/                      ← created automatically when you train
+│   ├── lstm_best.keras
+│   ├── bert_best.keras
+│   └── tokenizer.pkl
+│
 ├── data/
-│   └── sample_resumes/      # Place test resumes here
-├── app.py                   # Streamlit web UI
-├── main.py                  # CLI entry point
+│   └── resume_dataset.csv       ← download from Kaggle
+│
+├── docs/                        ← created automatically by the notebook
+│   ├── confusion_matrix_lstm.png
+│   ├── training_curves_lstm.png
+│   └── model_comparison.png
+│
+├── tests/
+│   └── test_parser_scorer.py    ← run with: pytest tests/
+│
+├── app.py                       ← streamlit web UI
+├── main.py                      ← CLI entry point
 ├── requirements.txt
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ---
