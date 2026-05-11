@@ -266,8 +266,21 @@ Automated tests currently pass:
 
 The project is now in a submission-ready state for the stated requirements:
 
-- resume parsing system: completed
-- LSTM / transformer NLP modeling: completed
-- train/test split: completed
-- accuracy and confusion matrix evaluation: completed
-- report updated with actual results: completed
+- [ ] Fine-tuned spaCy NER model trained on resume corpora
+- [ ] BERT/Sentence-Transformers for semantic similarity
+- [ ] Database integration (PostgreSQL) for multi-session storage
+- [ ] REST API with FastAPI
+- [ ] Resume anonymization for bias-free screening
+- [ ] Multi-language support
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## 👩‍💻 Author
+
+Built as an NLP capstone project demonstrating practical applications of natural language processing in HR automation.
