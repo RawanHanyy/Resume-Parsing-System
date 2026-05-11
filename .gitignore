@@ -1,0 +1,33 @@
+# Virtual environments
+venv/
+venv311/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Models (too large for GitHub)
+models/
+*.keras
+*.h5
+*.pkl
+
+# Data (too large for GitHub)
+data/
+*.csv
+
+# Docs outputs
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
