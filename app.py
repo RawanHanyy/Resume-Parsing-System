@@ -135,10 +135,12 @@ if st.button("🚀 Analyze Resumes", type="primary", disabled=not (jd_text and u
                 )
                 st.dataframe(breakdown_df, hide_index=True, use_container_width=True)
                 st.write("**Missing Skills:**")
-                if r["missing_skills"]:
+                if not r.get("required_skills"):
+                    st.info("No required skills detected from the job description.")
+                elif r["missing_skills"]:
                     st.error(", ".join(r["missing_skills"]))
                 else:
-                    st.success("All required skills matched!")
+                    st.success("All detected required skills matched!")
 
     # Download 
     st.divider()

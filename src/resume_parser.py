@@ -7,6 +7,7 @@ Extracts structured information from resumes using spaCy, regex, and keyword mat
 import re
 import json
 import spacy
+from datetime import date
 from pathlib import Path
 from typing import Optional
 import pdfplumber
@@ -31,6 +32,12 @@ SKILL_TAXONOMY = {
         "spring", "tensorflow", "pytorch", "keras", "scikit-learn", "pandas",
         "numpy", "spark", "hadoop",
     ],
+    "mobile": [
+        "ios", "android", "uikit", "swiftui", "objective-c", "xcode",
+        "testflight", "app store connect", "core data", "firebase", "realm",
+        "combine", "mvvm", "mvc", "clean architecture", "rest api",
+        "json", "push notifications", "in-app purchases",
+    ],
     "databases": [
         "sql", "mysql", "postgresql", "mongodb", "redis", "elasticsearch",
         "cassandra", "sqlite", "oracle", "dynamodb",
@@ -53,6 +60,11 @@ SKILL_TAXONOMY = {
 ALL_SKILLS: set[str] = {
     skill for category in SKILL_TAXONOMY.values() for skill in category
 }
+
+
+def skill_pattern(skill: str) -> re.Pattern:
+    escaped = re.escape(skill.lower())
+    return re.compile(r"(?<![a-z0-9+#./-])" + escaped + r"s?(?![a-z0-9+#./-])")
 
 
 # Section headers 
@@ -94,7 +106,7 @@ LINKEDIN_RE = re.compile(r"linkedin\.com/in/[\w\-]+", re.IGNORECASE)
 GITHUB_RE = re.compile(r"github\.com/[\w\-]+", re.IGNORECASE)
 
 # Year ranges for experience
-YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
+YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 DATE_RANGE_RE = re.compile(
     r"(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
     r"Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|"
@@ -193,7 +205,7 @@ class ResumeParser:
         text_lower = self.raw_text.lower()
         found: dict[str, list[str]] = {}
         for category, skills in SKILL_TAXONOMY.items():
-            matched = [s for s in skills if re.search(r"\b" + re.escape(s) + r"\b", text_lower)]
+            matched = [s for s in skills if skill_pattern(s).search(text_lower)]
             if matched:
                 found[category] = matched
         return found
@@ -265,11 +277,13 @@ class ResumeParser:
 
     # Estimate years of experience 
     def _estimate_experience_years(self) -> Optional[float]:
-        ranges = DATE_RANGE_RE.findall(self.raw_text)
-        years = YEAR_RE.findall(self.raw_text)
+        experience_text = self._get_section("experience") or self.raw_text
+        years = [int(y) for y in YEAR_RE.findall(experience_text)]
+        if re.search(r"\b(present|current)\b", experience_text, re.IGNORECASE):
+            years.append(date.today().year)
         if not years:
             return None
-        int_years = sorted(set(map(int, years)))
+        int_years = sorted(set(years))
         if len(int_years) >= 2:
             return float(int_years[-1] - int_years[0])
         return None
@@ -280,7 +294,7 @@ class ResumeParser:
         lines = self.raw_text.splitlines()
         start = None
         for i, line in enumerate(lines):
-            if pattern.search(line):
+            if self._looks_like_section_header(line, pattern):
                 start = i + 1
                 break
         if start is None:
@@ -291,7 +305,16 @@ class ResumeParser:
             p for k, p in SECTION_HEADERS.items() if k != section_name
         ]
         for i in range(start, len(lines)):
-            if any(p.search(lines[i]) for p in other_patterns):
+            if any(self._looks_like_section_header(lines[i], p) for p in other_patterns):
                 end = i
                 break
         return "\n".join(lines[start:end])
+
+    @staticmethod
+    def _looks_like_section_header(line: str, pattern: re.Pattern) -> bool:
+        cleaned = line.strip().strip("-–—:|")
+        if not cleaned:
+            return False
+        if len(cleaned.split()) > 5:
+            return False
+        return bool(pattern.search(cleaned))
