@@ -1,172 +1,270 @@
-# 📄 Resume Parsing System
+# Resume Parsing System
 
-> **NLP-powered Applicant Tracking System (ATS)** that automatically parses resumes and ranks candidates against job descriptions — eliminating manual screening effort for HR teams.
+This project is an NLP-based resume screening system for hiring and recruitment. It reads resumes, extracts structured candidate information, compares candidates against a job description, and returns ranked results. The repository also includes a deep learning notebook that trains and evaluates resume classification models to satisfy the course requirement for LSTM / transformer-based NLP.
 
----
+## Project Goal
 
-## 🗂️ Project Structure
+The main goal is to reduce manual HR screening effort by:
 
-```
-resume-parser/
+- parsing resumes automatically
+- extracting useful candidate data such as name, email, skills, education, and experience
+- scoring candidates against a target job description
+- ranking candidates with explainable score breakdowns
+- training and evaluating deep learning NLP models on labeled resume data
+
+## What The System Does
+
+The project has two parts.
+
+### 1. ATS Resume Parsing and Ranking
+
+This is the practical recruitment system.
+
+- Input: PDF, DOCX, or TXT resumes
+- Processing: text extraction, information extraction, skill matching, TF-IDF similarity, education scoring, experience scoring
+- Output: ranked candidates with recommendation labels
+
+Recommendation labels:
+
+- `75-100`: Strong Match
+- `55-74`: Potential Match
+- `35-54`: Weak Match
+- `0-34`: Poor Match
+
+### 2. Deep Learning Classification Notebook
+
+This is the academic NLP part of the project.
+
+- uses a labeled resume dataset
+- trains a `BiLSTM` model
+- trains a `DistilBERT` transformer model
+- evaluates both models using a train/test split
+- produces accuracy values, confusion matrices, and training curves
+
+## Project Structure
+
+```text
+Resume-Parsing-System/
+├── app.py
+├── main.py
+├── requirements.txt
+├── README.md
+├── CheckFinal.md
+├── documentation_report.tex
+├── notebooks/
+│   ├── train_model.ipynb
+│   └── train_model.executed.ipynb
+├── scripts/
+│   └── generate_resume_dataset.py
 ├── src/
-│   ├── resume_parser.py     # Core NLP extraction engine
-│   └── scorer.py            # TF-IDF + skill-match scoring
+│   ├── classifier.py
+│   ├── preprocess.py
+│   ├── resume_parser.py
+│   └── scorer.py
 ├── tests/
 │   └── test_parser_scorer.py
-├── data/
-│   └── sample_resumes/      # Place test resumes here
-├── app.py                   # Streamlit web UI
-├── main.py                  # CLI entry point
-├── requirements.txt
-└── README.md
+├── docs/
+│   ├── label_distribution.png
+│   ├── confusion_matrix_lstm.png
+│   ├── confusion_matrix_bert.png
+│   ├── training_curves_lstm.png
+│   ├── training_curves_bert.png
+│   └── model_comparison.png
+└── data/
+    ├── resume_dataset.csv
+    └── resume_dataset_fixed.csv
 ```
 
----
+## Technologies Used
 
-## ⚙️ Setup
+- Python
+- spaCy
+- pdfplumber
+- docx2txt
+- scikit-learn
+- TensorFlow / Keras
+- Hugging Face Transformers
+- Streamlit
+- Jupyter
+- pytest
 
-### 1. Clone the repo
+## How It Works
+
+### Resume Parsing Flow
+
+1. Read resume file
+2. Extract raw text
+3. Detect contact information using regex
+4. Extract name and sections using spaCy and heuristics
+5. Match skills against the built-in skill taxonomy
+6. Score the resume against the job description
+7. Return ranked output
+
+### Candidate Scoring
+
+The total score is calculated from four weighted parts:
+
+| Component | Weight |
+|---|---:|
+| Skill Match | 45% |
+| TF-IDF Similarity | 30% |
+| Education | 15% |
+| Experience | 10% |
+
+## Setup
+
+### 1. Create and activate a virtual environment
+
 ```bash
-git clone https://github.com/<your-username>/resume-parser.git
-cd resume-parser
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 2. Create a virtual environment
-```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-```
+### 2. Install dependencies
 
-### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-### 4. Generate the training dataset
+### 3. Generate the dataset for the notebook
+
 ```bash
 python scripts/generate_resume_dataset.py
 ```
 
 This creates:
+
 - `data/resume_dataset.csv`
 - `data/resume_dataset_fixed.csv`
 
----
+## How To Run
 
-## 🚀 Usage
+### Run the Streamlit app
 
-### CLI — Parse a single resume
-```bash
-python main.py parse --file resume.pdf
-python main.py parse --file resume.docx --output result.json
-```
-
-### CLI — Rank multiple resumes
-```bash
-python main.py rank \
-  --folder ./data/sample_resumes \
-  --jd job_description.txt \
-  --years 3 \
-  --output ranked.json
-```
-
-### Web UI (Streamlit)
 ```bash
 streamlit run app.py
 ```
-Then open [http://localhost:8501](http://localhost:8501)
 
-### Notebook — Train and Evaluate LSTM + BERT
+### Run the CLI parser
+
+```bash
+python main.py parse --file resume.pdf
+```
+
+### Run the CLI ranking flow
+
+```bash
+python main.py rank --folder ./data/sample_resumes --jd job_description.txt --years 3
+```
+
+### Run the notebook
+
 ```bash
 jupyter notebook notebooks/train_model.ipynb
 ```
 
-The notebook will auto-generate the local dataset if it is missing.
-
----
-
-## 🧠 How It Works
-
-### 1. Text Extraction
-Supports **PDF** (via `pdfplumber`), **DOCX** (via `docx2txt`), and **plain text**.
-
-### 2. NLP Information Extraction
-Uses **spaCy `en_core_web_sm`** for named entity recognition (NER) and custom regex pipelines to extract:
-
-| Field | Method |
-|---|---|
-| Name | NER (PERSON entity) + first-line heuristic |
-| Email / Phone / LinkedIn | Regex |
-| Skills | Keyword matching against 60+ skill taxonomy |
-| Education | Degree regex + section parsing |
-| Experience | Date-range regex + section parsing |
-| Certifications | Keyword + section parsing |
-
-### 3. Scoring Algorithm
-
-Each candidate is scored on a **0–100 scale** using four weighted components:
-
-| Component | Weight | Method |
-|---|---|---|
-| Skill Match | 45% | Jaccard overlap vs. JD skills |
-| Semantic Similarity | 30% | TF-IDF cosine similarity |
-| Education | 15% | Degree rank (PhD > Master > Bachelor > Associate) |
-| Experience | 10% | Years ratio vs. required years |
-
-### 4. Recommendations
-
-| Score | Label |
-|---|---|
-| ≥ 75% | ✅ Strong Match — Recommend for Interview |
-| 55–74% | 🟡 Potential Match — Consider for Screening |
-| 35–54% | 🟠 Weak Match — Review Manually |
-| < 35% | ❌ Poor Match — Likely to Reject |
-
----
-
-## 🧪 Running Tests
+### Run tests
 
 ```bash
-pytest tests/ -v
+pytest -q
 ```
 
----
+## What We Needed To Do
 
-## 📊 Sample Output
+Based on the project brief in `CheckFinal.md`, the required work was:
 
-```json
-{
-  "name": "John Doe",
-  "email": "john.doe@email.com",
-  "total_score": 82.4,
-  "breakdown": {
-    "skill_match": 88.0,
-    "tfidf_sim": 76.3,
-    "education": 50.0,
-    "experience": 100.0
-  },
-  "matched_skills": ["python", "django", "postgresql", "aws", "docker"],
-  "missing_skills": ["kubernetes", "redis"],
-  "recommendation": "Strong Match — Recommend for Interview"
-}
+- solve the recruitment NLP problem using models such as LSTM or transformers
+- prepare a dataset and split it into training and testing sets
+- evaluate the model using accuracy, confusion matrix, and similar metrics
+- build a working NLP application around the chosen problem
+
+## What We Completed
+
+The repository now includes:
+
+- a working resume parsing and candidate ranking pipeline
+- a Streamlit interface
+- a command-line interface
+- a reproducible dataset generation script
+- an executable training notebook
+- an LSTM classification model
+- a transformer classification model
+- evaluation plots and metrics
+- automated tests
+- an updated report file for Overleaf
+
+## Dataset and Experiment Setup
+
+The classification workflow uses a generated labeled dataset for reproducibility.
+
+- total samples: `192`
+- number of categories: `8`
+- split: `80% train / 20% test`
+- notebook: `notebooks/train_model.ipynb`
+
+Resume categories used in training:
+
+- Business Analyst
+- Data Scientist
+- DevOps Engineer
+- HR Specialist
+- Java Developer
+- Network Engineer
+- Python Developer
+- UI UX Designer
+
+## Results
+
+The notebook was executed successfully and produced the following results.
+
+| Model | Test Accuracy |
+|---|---:|
+| BiLSTM | `87.18%` |
+| DistilBERT | `79.49%` |
+
+Current conclusion:
+
+- the `BiLSTM` model performed better than `DistilBERT` on the current dataset
+- the difference in this run was `7.69` percentage points
+- both models trained successfully and generated evaluation artifacts
+
+Generated evaluation files:
+
+- `docs/label_distribution.png`
+- `docs/confusion_matrix_lstm.png`
+- `docs/confusion_matrix_bert.png`
+- `docs/training_curves_lstm.png`
+- `docs/training_curves_bert.png`
+- `docs/model_comparison.png`
+
+## Testing Status
+
+Automated tests currently pass:
+
+```text
+25 passed
 ```
 
----
+## Current Limitations
 
-## 🛠️ Technologies
+- the ATS skill extraction is still keyword-based
+- experience estimation is approximate
+- the classifier is not yet integrated into the ranking app
+- the classification dataset is synthetic, not a real collected resume corpus
+- PDF structure can still affect extraction quality
 
-- **Python 3.10+**
-- **spaCy** — NER and linguistic analysis
-- **pdfplumber** — PDF text extraction
-- **docx2txt** — Word document parsing
-- **Streamlit** — Web UI
-- **pandas** — Data display
-- **pytest** — Testing
+## Suggested Next Steps
 
----
+- integrate the classifier into the main ATS flow
+- improve semantic matching with stronger embedding models
+- expand the skill taxonomy and synonyms
+- improve experience calculation from exact date spans
+- add API or database support
 
-## 📌 Future Improvements
+## Final Status
+
+The project is now in a submission-ready state for the stated requirements:
 
 - [ ] Fine-tuned spaCy NER model trained on resume corpora
 - [ ] BERT/Sentence-Transformers for semantic similarity
