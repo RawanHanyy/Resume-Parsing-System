@@ -11,6 +11,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from classifier import ResumeClassifier
 from resume_parser import ResumeParser, EMAIL_RE, PHONE_RE, DEGREE_PATTERNS
 from scorer import CandidateScorer, rank_candidates, _cosine, _tfidf_vectors, _recommendation
 
@@ -204,3 +205,42 @@ class TestRankCandidates:
         result = rank_candidates([sample_parsed], JOB_DESCRIPTION)
         assert isinstance(result, list)
         assert len(result) == 1
+
+
+class TestResumeClassifier:
+    def test_bert_training_initializes_tokenizer_before_encoding(self, tmp_path, monkeypatch):
+        csv_path = tmp_path / "dataset.csv"
+        rows = ["Resume_str,Category"]
+        for idx in range(6):
+            rows.append(f"Python developer resume {idx},Python Developer")
+            rows.append(f"Data scientist resume {idx},Data Scientist")
+        csv_path.write_text("\n".join(rows), encoding="utf-8")
+
+        class FakeHistory:
+            history = {
+                "accuracy": [1.0],
+                "val_accuracy": [1.0],
+                "loss": [0.1],
+                "val_loss": [0.1],
+            }
+
+        class FakeModel:
+            def fit(self, *args, **kwargs):
+                return FakeHistory()
+
+        def fake_build_bert(self):
+            self.bert_tokenizer = object()
+            return FakeModel()
+
+        def fake_encode_bert(self, texts):
+            assert hasattr(self, "bert_tokenizer")
+            return {"input_ids": list(texts)}
+
+        monkeypatch.setattr(ResumeClassifier, "_build_bert", fake_build_bert)
+        monkeypatch.setattr(ResumeClassifier, "_encode_bert", fake_encode_bert)
+
+        clf = ResumeClassifier(model_type="bert")
+        clf.train(str(csv_path))
+
+        assert clf.model is not None
+        assert clf.X_test is not None

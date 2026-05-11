@@ -43,6 +43,15 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
+### 4. Generate the training dataset
+```bash
+python scripts/generate_resume_dataset.py
+```
+
+This creates:
+- `data/resume_dataset.csv`
+- `data/resume_dataset_fixed.csv`
+
 ---
 
 ## 🚀 Usage
@@ -67,6 +76,13 @@ python main.py rank \
 streamlit run app.py
 ```
 Then open [http://localhost:8501](http://localhost:8501)
+
+### Notebook — Train and Evaluate LSTM + BERT
+```bash
+jupyter notebook notebooks/train_model.ipynb
+```
+
+The notebook will auto-generate the local dataset if it is missing.
 
 ---
 

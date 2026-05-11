@@ -1,0 +1,498 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\setstretch{1.2}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Documentation Report}
+\fancyhead[R]{Resume Parsing System}
+\fancyfoot[C]{\thepage}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{0.75em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.75em}{}
+
+\newcommand{\screenshotbox}[2]{
+    \begin{figure}[H]
+        \centering
+        \fbox{
+            \parbox[c][7cm][c]{0.88\textwidth}{
+                \centering
+                \textbf{Screenshot Placeholder}\\[6pt]
+                Insert #1 here\\[4pt]
+                Suggested file name: \texttt{#2}
+            }
+        }
+        \caption{#1}
+    \end{figure}
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+
+    % Replace logo.png with your university logo file name
+    \includegraphics[width=0.22\textwidth]{logo.png}\par
+    \vspace{1.2cm}
+
+    {\Large \textbf{Documentation Report}\par}
+    \vspace{0.5cm}
+    {\LARGE \textbf{Resume Parsing System}\par}
+    \vspace{0.8cm}
+    {\large Hiring and Recruitment using NLP\par}
+
+    \vfill
+
+    \begin{tabular}{>{\bfseries}p{4cm}p{9cm}}
+        Presented to: & Dr. \underline{\hspace{7cm}} \\
+        Course / Subject: & \underline{\hspace{7cm}} \\
+        University: & \underline{\hspace{7cm}} \\
+        Department: & \underline{\hspace{7cm}} \\
+    \end{tabular}
+
+    \vspace{1.2cm}
+
+    {\large \textbf{Prepared by}\par}
+    \vspace{0.4cm}
+
+    \begin{tabular}{|p{1cm}|p{6cm}|p{5cm}|}
+        \hline
+        No. & Member Name & ID \\
+        \hline
+        1 & \underline{\hspace{5.5cm}} & \underline{\hspace{4.2cm}} \\
+        \hline
+        2 & \underline{\hspace{5.5cm}} & \underline{\hspace{4.2cm}} \\
+        \hline
+    \end{tabular}
+
+    \vfill
+
+    {\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Abstract}
+This report presents the design and implementation of a Resume Parsing System that supports hiring and recruitment tasks using Natural Language Processing (NLP). The system reads resumes in multiple formats, extracts structured information such as candidate name, contact information, skills, education, and experience, and then compares candidates against a job description to generate a ranked list.
+
+The project combines rule-based text extraction, NLP methods, similarity scoring, and user-friendly presentation through both command line and web interfaces. In addition to the ATS pipeline, the repository also contains a separate deep learning classification module based on LSTM and transformer models, which aligns the project with academic NLP requirements.
+
+\section{Project Overview}
+This project is an NLP-based Applicant Tracking System (ATS) that automates resume screening. It reads resumes in PDF, DOCX, or TXT format, extracts structured candidate information, compares candidates against a job description, and produces a ranked list with recommendation labels.
+
+The main goal is to reduce manual effort for HR staff by converting unstructured resumes into machine-readable data and then applying a scoring method that highlights the best matches for a given role.
+
+\section{Problem Statement}
+Recruiters often review a large number of resumes for a single vacancy. Manual filtering is slow, repetitive, and may miss strong candidates when the volume is high. This project addresses that problem by:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item extracting important data automatically from resumes,
+    \item matching candidate skills against the job description,
+    \item estimating suitability using a weighted score,
+    \item presenting the results through both CLI and web interface.
+\end{itemize}
+
+\section{Objectives}
+The project aims to achieve the following:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item automate resume reading and information extraction,
+    \item reduce manual effort in candidate shortlisting,
+    \item provide explainable candidate ranking instead of black-box results,
+    \item support both technical users through CLI and non-technical users through a web interface,
+    \item demonstrate practical use of NLP in a real-world recruitment problem.
+\end{itemize}
+
+\section{Scope of the Project}
+The implemented system focuses on resume parsing and candidate ranking for a single job description at a time. It is a practical prototype rather than a complete enterprise ATS. The current scope includes:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item reading resume files,
+    \item extracting candidate information,
+    \item scoring candidates against a target role,
+    \item ranking candidates and displaying the results,
+    \item providing a separate module for deep learning-based classification experiments.
+\end{itemize}
+
+\section{Project Structure}
+The repository is organized around a small set of focused modules:
+
+\begin{longtable}{p{4cm}p{10cm}}
+\toprule
+\textbf{File / Folder} & \textbf{Purpose} \\
+\midrule
+\texttt{app.py} & Streamlit web application for uploading resumes and displaying rankings. \\
+\texttt{main.py} & Command line entry point for parsing one resume or ranking a folder of resumes. \\
+\texttt{src/resume\_parser.py} & Core parser that extracts contact info, name, summary, skills, education, experience, projects, certifications, and estimated years of experience. \\
+\texttt{src/scorer.py} & Candidate scoring and ranking logic. \\
+\texttt{src/classifier.py} & Separate ML classification module for training LSTM or BERT-based resume category classifiers. \\
+\texttt{src/preprocess.py} & Text cleaning pipeline used by the classifier module. \\
+\texttt{tests/test\_parser\_scorer.py} & Unit tests for parsing and scoring logic. \\
+\texttt{requirements.txt} & Project dependencies. \\
+\bottomrule
+\end{longtable}
+
+\section{Technologies Used}
+\begin{longtable}{p{4cm}p{10cm}}
+\toprule
+\textbf{Technology} & \textbf{Purpose in the Project} \\
+\midrule
+Python & Main implementation language for all modules. \\
+spaCy & Named entity recognition and NLP support. \\
+pdfplumber & PDF resume text extraction. \\
+docx2txt & DOCX resume text extraction. \\
+Streamlit & Browser-based user interface. \\
+pandas & Formatting and displaying ranking tables in the app. \\
+TensorFlow / Keras & Deep learning support for LSTM classifier. \\
+Transformers & DistilBERT-based classification support. \\
+scikit-learn & Supporting utilities for model preparation and evaluation. \\
+pytest & Automated testing for parser and scoring modules. \\
+\bottomrule
+\end{longtable}
+
+\section{System Architecture}
+The project can be viewed as a pipeline-based system. The overall flow is:
+
+\begin{verbatim}
+Resume File -> Text Extraction -> Information Extraction -> Parsed Data
+Parsed Data + Job Description -> Scoring Engine -> Ranked Results
+Ranked Results -> CLI Output / Streamlit UI / JSON Export
+\end{verbatim}
+
+This architecture separates responsibilities clearly:
+\begin{itemize}[leftmargin=1.5em]
+    \item input and file handling,
+    \item text extraction,
+    \item data extraction,
+    \item scoring and ranking,
+    \item user presentation.
+\end{itemize}
+
+\section{System Workflow}
+\subsection{Step 1: Resume Input}
+The system accepts resumes in:
+\begin{itemize}[leftmargin=1.5em]
+    \item PDF using \texttt{pdfplumber},
+    \item DOCX using \texttt{docx2txt},
+    \item TXT using standard file reading.
+\end{itemize}
+
+\subsection{Step 2: Text Extraction}
+The raw text is extracted from the selected file. For PDF files, each page is processed and combined into a single text block. For DOCX and TXT files, the text is read directly.
+
+\subsection{Step 3: Information Extraction}
+The parser uses:
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{spaCy} for named entity recognition,
+    \item \textbf{regular expressions} for email, phone, LinkedIn, GitHub, degree, and date patterns,
+    \item \textbf{keyword matching} for skills,
+    \item \textbf{section-based parsing} for summary, education, experience, projects, and certifications.
+\end{itemize}
+
+\subsection{Step 4: Candidate Scoring}
+Each parsed resume is compared with the job description. The project calculates four score components:
+
+\begin{longtable}{p{4cm}p{2.5cm}p{8cm}}
+\toprule
+\textbf{Component} & \textbf{Weight} & \textbf{Meaning} \\
+\midrule
+Skill Match & 45\% & Ratio of job-required skills found in the candidate resume. \\
+TF-IDF Similarity & 30\% & Cosine similarity between reconstructed resume text and the job description. \\
+Education & 15\% & Degree-based score using rank order from Associate up to PhD. \\
+Experience & 10\% & Ratio between estimated candidate years and required years. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Step 5: Final Recommendation}
+The total score is converted to one of four labels:
+
+\begin{longtable}{p{3cm}p{10cm}}
+\toprule
+\textbf{Score Range} & \textbf{Recommendation} \\
+\midrule
+75 to 100 & Strong Match --- Recommend for Interview \\
+55 to 74 & Potential Match --- Consider for Screening \\
+35 to 54 & Weak Match --- Review Manually \\
+Below 35 & Poor Match --- Likely to Reject \\
+\bottomrule
+\end{longtable}
+
+\section{Detailed Explanation of Each Module}
+\subsection{\texttt{resume\_parser.py}}
+This is the core extraction engine. It creates a \texttt{ResumeParser} object using a file path and returns a Python dictionary with the parsed result.
+
+The parser extracts:
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{Contact}: email, phone, LinkedIn, GitHub.
+    \item \textbf{Name}: first PERSON entity from the first lines, with fallback to the first non-empty line.
+    \item \textbf{Summary}: text under the summary section.
+    \item \textbf{Skills}: categorized skills such as programming languages, frameworks, databases, cloud tools, data science, and soft skills.
+    \item \textbf{Education}: degree text and detected years.
+    \item \textbf{Experience}: date range, title line, and bullet points under experience.
+    \item \textbf{Projects}: project section lines.
+    \item \textbf{Certifications}: certifications section or a fallback regex scan.
+    \item \textbf{Total Experience Years}: estimated from the earliest and latest detected years in the resume text.
+\end{itemize}
+
+\subsection{\texttt{scorer.py}}
+This module ranks parsed resumes against a job description.
+
+Main logic:
+\begin{itemize}[leftmargin=1.5em]
+    \item extract required skills from the job description,
+    \item rebuild a text representation of the candidate profile,
+    \item compute a TF-IDF style vector similarity,
+    \item compute weighted total score,
+    \item generate final recommendation label.
+\end{itemize}
+
+\subsection{\texttt{main.py}}
+This is the command line interface. It supports two commands:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{parse}: parse one resume file and print or save JSON output.
+    \item \texttt{rank}: parse all resumes in a folder and rank them against a job description file.
+\end{itemize}
+
+\subsection{\texttt{app.py}}
+This is the Streamlit interface. It allows the user to:
+\begin{itemize}[leftmargin=1.5em]
+    \item enter the job description,
+    \item upload multiple resumes,
+    \item set required years of experience,
+    \item display candidate rankings in a table,
+    \item view detailed analysis per candidate,
+    \item download results as JSON.
+\end{itemize}
+
+\subsection{\texttt{classifier.py}}
+This file is different from the ATS ranking flow. It is intended for training a resume category classifier using deep learning. It supports:
+\begin{itemize}[leftmargin=1.5em]
+    \item Bidirectional LSTM,
+    \item DistilBERT-based transformer classification.
+\end{itemize}
+
+This module fits the assignment requirement for training and evaluation with a labeled dataset. It is not currently connected to the web app or CLI ranking flow.
+
+\subsection{\texttt{preprocess.py}}
+This module cleans raw text before training the classifier. It lowercases text, removes URLs, emails, phone numbers, symbols, digits, stopwords, and extra whitespace.
+
+\section{Dataset and Experimental Setup}
+To satisfy the course requirement for supervised NLP modeling, the project includes a labeled resume classification workflow. A reproducible dataset generation script creates a local CSV dataset for training and evaluation.
+
+\begin{itemize}[leftmargin=1.5em]
+    \item Dataset generator: \texttt{scripts/generate\_resume\_dataset.py}
+    \item Output files: \texttt{data/resume\_dataset.csv} and \texttt{data/resume\_dataset\_fixed.csv}
+    \item Total samples: 192 synthetic resumes
+    \item Number of classes: 8 resume categories
+    \item Split strategy: 80\% training and 20\% testing using stratified sampling
+\end{itemize}
+
+The eight categories used in the experiment are:
+\begin{itemize}[leftmargin=1.5em]
+    \item Business Analyst
+    \item Data Scientist
+    \item DevOps Engineer
+    \item HR Specialist
+    \item Java Developer
+    \item Network Engineer
+    \item Python Developer
+    \item UI UX Designer
+\end{itemize}
+
+The notebook \texttt{notebooks/train\_model.ipynb} executes the complete workflow: dataset loading, text cleaning, model training, evaluation, confusion matrix generation, training curve generation, and single-resume prediction.
+
+\section{Expected Output and Result Interpretation}
+The parser returns structured JSON data. A typical output contains:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item candidate name,
+    \item contact information,
+    \item extracted skills,
+    \item education entries,
+    \item experience entries,
+    \item projects and certifications,
+    \item estimated total experience years.
+\end{itemize}
+
+After scoring, the result also includes:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item total score from 0 to 100,
+    \item score breakdown by component,
+    \item matched skills,
+    \item missing skills,
+    \item final recommendation label.
+\end{itemize}
+
+\subsection{How to Read the Result}
+\begin{itemize}[leftmargin=1.5em]
+    \item A high \textbf{skill match} means the resume contains many required technologies from the job description.
+    \item A high \textbf{TF-IDF similarity} means the wording of the resume is semantically close to the job description.
+    \item A high \textbf{education score} means the candidate has a stronger detected degree level.
+    \item A high \textbf{experience score} means the candidate meets or exceeds required years.
+    \item The \textbf{missing skills} list helps identify gaps quickly.
+\end{itemize}
+
+\section{Model Training and Evaluation Results}
+The classification module was executed successfully using the project notebook and produced the required evaluation metrics and plots. Two deep learning approaches were tested:
+
+\begin{itemize}[leftmargin=1.5em]
+    \item Bidirectional LSTM implemented with TensorFlow / Keras
+    \item DistilBERT transformer classifier implemented with Hugging Face Transformers and TensorFlow
+\end{itemize}
+
+\subsection{Measured Accuracy}
+\begin{longtable}{p{4.2cm}p{5cm}p{4cm}}
+\toprule
+\textbf{Model} & \textbf{Architecture} & \textbf{Test Accuracy} \\
+\midrule
+BiLSTM & 2-layer Bidirectional LSTM & 87.18\% \\
+DistilBERT & Transformer sequence classifier & 79.49\% \\
+\bottomrule
+\end{longtable}
+
+In this experiment, the BiLSTM model outperformed DistilBERT on the generated dataset by 7.69 percentage points. This result is specific to the current dataset size, class distribution, and training configuration.
+
+\subsection{Evaluation Artifacts}
+The notebook exported the following figures to the \texttt{docs/} directory:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{docs/label\_distribution.png}
+    \item \texttt{docs/confusion\_matrix\_lstm.png}
+    \item \texttt{docs/confusion\_matrix\_bert.png}
+    \item \texttt{docs/training\_curves\_lstm.png}
+    \item \texttt{docs/training\_curves\_bert.png}
+    \item \texttt{docs/model\_comparison.png}
+\end{itemize}
+
+\subsection{Result Interpretation}
+\begin{itemize}[leftmargin=1.5em]
+    \item The LSTM model achieved the strongest overall classification accuracy on the current dataset.
+    \item The DistilBERT model trained successfully and produced full evaluation outputs, but its accuracy was lower in this experiment.
+    \item The confusion matrices make it possible to inspect which categories are easiest or hardest to separate.
+    \item The training curves help evaluate convergence behavior and possible overfitting.
+\end{itemize}
+
+\section{Testing and Validation}
+The project includes unit tests for:
+\begin{itemize}[leftmargin=1.5em]
+    \item regex extraction,
+    \item parser output structure,
+    \item TF-IDF helper functions,
+    \item candidate scoring,
+    \item ranking order,
+    \item BERT training initialization order.
+\end{itemize}
+
+These tests verify that the parser returns the expected keys, that candidate scores stay within a valid range, that stronger resumes rank above weaker ones, and that the transformer training path initializes correctly before token encoding.
+
+The current automated test result is:
+\begin{itemize}[leftmargin=1.5em]
+    \item \texttt{25 passed}
+\end{itemize}
+
+\section{Strengths of the Project}
+\begin{itemize}[leftmargin=1.5em]
+    \item Clear separation between parsing, scoring, interface, and ML training.
+    \item Supports multiple resume file formats.
+    \item Easy-to-understand weighted scoring system.
+    \item Includes both CLI and web interface.
+    \item Includes unit tests for the main ATS pipeline.
+\end{itemize}
+
+\section{Current Limitations}
+\begin{itemize}[leftmargin=1.5em]
+    \item Skill extraction is keyword-based, so synonyms may be missed.
+    \item Experience estimation is approximate because it relies on the earliest and latest detected years in the resume text.
+    \item The deep learning classifier module is separate and not integrated into the ranking app.
+    \item The current semantic similarity is a lightweight TF-IDF style approach, not a transformer embedding model.
+    \item PDF formatting differences may affect extraction quality.
+    \item The classification experiment currently uses a synthetic generated dataset rather than a manually collected real-world resume corpus.
+\end{itemize}
+
+\section{Suggested Improvements}
+\begin{itemize}[leftmargin=1.5em]
+    \item Integrate the classifier into the web app.
+    \item Use transformer embeddings for stronger semantic matching.
+    \item Improve experience calculation using exact date spans rather than only year difference.
+    \item Expand the skill taxonomy and support synonyms.
+    \item Add persistent storage or API endpoints.
+\end{itemize}
+
+\section{How to Run the Project}
+\subsection{Web Interface}
+\begin{verbatim}
+source .venv/bin/activate
+streamlit run app.py
+\end{verbatim}
+
+\subsection{CLI Parsing}
+\begin{verbatim}
+python main.py parse --file resume.pdf
+\end{verbatim}
+
+\subsection{CLI Ranking}
+\begin{verbatim}
+python main.py rank --folder ./data/sample_resumes --jd job_description.txt --years 3
+\end{verbatim}
+
+\subsection{Notebook Training}
+\begin{verbatim}
+python scripts/generate_resume_dataset.py
+jupyter notebook notebooks/train_model.ipynb
+\end{verbatim}
+
+\section{Screenshots}
+The following generated figures can be inserted directly in Overleaf if the image files from the \texttt{docs/} folder are uploaded with the report:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{docs/label_distribution.png}
+    \caption{Resume category distribution used for classification training}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{docs/confusion_matrix_lstm.png}
+    \caption{Confusion matrix for the BiLSTM classifier}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{docs/confusion_matrix_bert.png}
+    \caption{Confusion matrix for the DistilBERT classifier}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.78\textwidth]{docs/model_comparison.png}
+    \caption{Comparison of final test accuracy between BiLSTM and DistilBERT}
+\end{figure}
+
+\section{Conclusion}
+The Resume Parsing System demonstrates a practical NLP application for recruitment support. It transforms unstructured resumes into structured candidate profiles and ranks applicants against a job description using a transparent weighted scoring method. In addition, the project satisfies the academic NLP requirement through a supervised classification workflow using both BiLSTM and DistilBERT models, an 80/20 train-test split, measured accuracy, confusion matrices, and training curves. Based on the current experiment, the BiLSTM model achieved 87.18\% accuracy while DistilBERT achieved 79.49\%.
+
+\end{document}
