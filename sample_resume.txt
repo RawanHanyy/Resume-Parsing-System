@@ -1,0 +1,21 @@
+John Doe
+john.doe@example.com
++1 555 123 4567
+linkedin.com/in/johndoe
+github.com/johndoe
+
+Summary
+Python developer with 4 years of experience building web applications and data tools.
+
+Skills
+Python, Django, FastAPI, PostgreSQL, AWS, Docker, Git, pandas, NumPy, scikit-learn
+
+Experience
+Jan 2021 - Present
+Backend Developer
+- Built REST APIs using Django and FastAPI
+- Deployed services on AWS with Docker
+- Worked with PostgreSQL and Git-based CI workflows
+
+Education
+B.Sc. in Computer Science, 2020

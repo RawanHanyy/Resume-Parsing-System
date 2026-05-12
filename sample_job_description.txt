@@ -1,0 +1,1 @@
+We are looking for a Python developer with experience in Django, FastAPI, PostgreSQL, AWS, Docker, Git, and pandas. Candidates should have at least 3 years of professional experience building backend systems and APIs.
