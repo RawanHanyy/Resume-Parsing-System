@@ -1,0 +1,23 @@
+Python Developer
+
+We are looking for a Python Developer to join our backend engineering team.
+
+Requirements:
+- Strong Python programming skills
+- Experience with Django or FastAPI
+- Good knowledge of REST APIs
+- Experience with PostgreSQL or MySQL
+- Familiarity with AWS or Docker
+- Good understanding of Git and software development workflows
+- 2+ years of experience in backend development
+
+Nice to have:
+- Experience with machine learning or data analysis
+- Experience with CI/CD pipelines
+- Good communication and teamwork skills
+
+Main responsibilities:
+- Build backend services and APIs
+- Work with databases and cloud deployment tools
+- Collaborate with the frontend and QA teams
+- Maintain clean, tested, and scalable code

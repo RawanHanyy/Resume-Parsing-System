@@ -1,0 +1,25 @@
+Omar Khaled
+omar.khaled.ds@gmail.com
++20 102 888 2211
+linkedin.com/in/omarkhaled
+github.com/omar-data
+
+Summary
+Data analyst and junior machine learning engineer with strong Python skills and analytics background.
+
+Skills
+Python, pandas, NumPy, scikit-learn, SQL, Excel, Tableau, statistics, machine learning, communication
+
+Experience
+Feb 2023 - Present
+Data Analyst
+- Cleaned and analyzed business data using Python and pandas
+- Built reports and dashboards for stakeholders
+- Used SQL to query company databases
+
+Education
+B.Sc. in Information Systems, 2022
+
+Projects
+- Customer churn prediction model using scikit-learn
+- Data cleaning pipeline in Python

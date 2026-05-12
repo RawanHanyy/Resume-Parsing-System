@@ -1,0 +1,25 @@
+Mohamed Samy
+m.samy.backend@gmail.com
++20 109 333 8899
+linkedin.com/in/mohamedsamybackend
+github.com/mohamed-samy
+
+Summary
+Junior backend developer focused on Python web applications and API development.
+
+Skills
+Python, Django, REST API, SQLite, PostgreSQL, Git, Docker, problem solving, teamwork
+
+Experience
+Aug 2023 - Present
+Junior Backend Developer
+- Implemented backend endpoints in Django
+- Wrote API documentation and tested endpoints
+- Worked with PostgreSQL in development
+
+Education
+B.Sc. in Software Engineering, 2023
+
+Projects
+- Blog API using Django REST concepts
+- Student portal backend in Python

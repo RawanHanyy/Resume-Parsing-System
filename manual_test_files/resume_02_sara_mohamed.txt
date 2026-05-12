@@ -1,0 +1,30 @@
+Sara Mohamed
+sara.mohamed.tech@gmail.com
++20 101 777 3300
+linkedin.com/in/saramohamedtech
+github.com/sara-m-tech
+
+Summary
+Software engineer with 3 years of experience in web application development and backend services.
+
+Skills
+Python, Flask, FastAPI, SQL, PostgreSQL, Docker, Git, Linux, Agile, teamwork, communication
+
+Experience
+Jun 2022 - Present
+Software Engineer
+- Developed backend services in Python and FastAPI
+- Designed SQL queries and managed PostgreSQL data
+- Used Docker in development and deployment workflows
+
+Jan 2021 - May 2022
+Junior Developer
+- Built internal tools using Flask
+- Worked with Git and issue tracking systems
+
+Education
+Bachelor of Computer Science, 2021
+
+Projects
+- Task tracking API using FastAPI
+- Reporting dashboard backend with Flask

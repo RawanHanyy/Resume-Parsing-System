@@ -1,0 +1,26 @@
+Ahmed Hassan
+ahmed.hassan.dev@gmail.com
++20 100 555 1122
+linkedin.com/in/ahmedhassan
+github.com/ahmedhassan-dev
+
+Summary
+Backend Python developer with 4 years of experience building APIs and internal business systems.
+
+Skills
+Python, Django, FastAPI, REST API, PostgreSQL, MySQL, AWS, Docker, Git, Linux, CI/CD, pandas
+
+Experience
+Jan 2021 - Present
+Backend Developer
+- Built REST APIs using Django and FastAPI
+- Worked with PostgreSQL and MySQL
+- Deployed services using Docker and AWS
+- Collaborated with frontend team and QA team
+
+Education
+B.Sc. in Computer Science, 2020
+
+Projects
+- Inventory management system using Django and PostgreSQL
+- API integration service for internal tools
