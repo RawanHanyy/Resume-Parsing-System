@@ -571,6 +571,136 @@ System result:
 - education and experience extraction are heuristic-based
 - dataset size can limit transformer performance
 
+## Possible doctor questions
+
+This section gives short direct answers to common questions that may be asked during discussion or evaluation.
+
+### 1. Did the project use one of the required NLP models such as RNN, LSTM, GRU, HMM, or transformers?
+
+Yes.
+
+The project uses:
+
+- `BiLSTM` in `src/classifier.py`
+- `DistilBERT` transformer in `src/classifier.py`
+
+So the project satisfies the requirement of using deep learning NLP models, specifically one recurrent model and one transformer model.
+
+### 2. What NLP problem does the project solve?
+
+The project solves an NLP problem in hiring and recruitment.
+
+It does two main tasks:
+
+- resume parsing and information extraction
+- resume classification and candidate ranking
+
+The ATS system reads resumes, extracts useful data, compares candidates to a job description, and ranks them. The classification part predicts the job category of a resume.
+
+### 3. Where is the main system implemented?
+
+The main system is split into these files:
+
+- `app.py`
+  Website interface using Streamlit
+
+- `src/resume_parser.py`
+  Resume parsing and information extraction
+
+- `src/scorer.py`
+  Candidate scoring and ranking
+
+- `src/classifier.py`
+  LSTM and DistilBERT model training, evaluation, and prediction
+
+### 4. Did the project use a suitable dataset?
+
+Yes, the classification workflow is designed to train on a resume dataset with labeled categories.
+
+The code expects a CSV dataset and supports:
+
+- reading the dataset
+- cleaning text
+- removing duplicates
+- filtering weak classes
+- encoding labels
+
+Note:
+The training code clearly supports and uses a dataset, but if the final submission requires the raw dataset file itself, it should be included separately if it is not already part of the submitted materials.
+
+### 5. Did the project split the data into training and testing sets?
+
+Yes.
+
+The project uses `train_test_split(...)` inside `src/classifier.py` to divide the dataset into training and testing data before model training and evaluation.
+
+This satisfies the requirement for train/test splitting.
+
+### 6. Did the project evaluate performance using accuracy?
+
+Yes.
+
+The classifier evaluation computes test accuracy and prints it after running on the test set.
+
+The project also compares model performance between:
+
+- `BiLSTM`
+- `DistilBERT`
+
+So the project does not only train models, but also measures how well they perform.
+
+### 7. Did the project generate a confusion matrix?
+
+Yes.
+
+The evaluation code creates confusion matrices for the trained models, and the generated figures are saved in the `docs/` folder.
+
+Examples:
+
+- `docs/confusion_matrix_lstm.png`
+- `docs/confusion_matrix_bert.png`
+
+This satisfies the requirement for confusion matrix based evaluation.
+
+### 8. What other evaluation outputs are included?
+
+The project includes more than just accuracy and confusion matrices.
+
+Additional outputs include:
+
+- training curves
+- precision, recall, and F1-score per class
+- model comparison plots
+- prediction confidence plots
+- executed notebook results
+
+These outputs make the evaluation stronger and more complete.
+
+### 9. Why did the project use both BiLSTM and DistilBERT?
+
+The reason is to compare two different NLP approaches:
+
+- `BiLSTM` represents sequential deep learning for text
+- `DistilBERT` represents transformer-based contextual language modeling
+
+This makes the project stronger academically because it shows model comparison, not just a single model.
+
+### 10. Why is this project suitable for the course requirement?
+
+Because it includes all major expected parts:
+
+- a real NLP problem in recruitment
+- practical resume parsing application
+- deep learning models
+- dataset preprocessing
+- train/test split
+- evaluation metrics
+- confusion matrices
+- result visualizations
+- working website and command-line interface
+
+So the project is not only theoretical, but also implemented as a complete usable system.
+
 ## Summary
 
 This project is a complete resume analysis system that combines:
